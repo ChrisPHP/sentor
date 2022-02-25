@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - release-test
+      - master
     paths:
       - '*'
       - .github/workflows/release.yml
