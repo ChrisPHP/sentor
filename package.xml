@@ -4,16 +4,14 @@
   <version>2.2.0</version>
   <description>The sentor package, to monitor ROS messages</description>
 
-  <maintainer email="fdelduchetto@lincoln.ac.uk">Francesco Del Duchetto</maintainer>
   <maintainer email="abinch@sagarobotics.com">Adam Binch</maintainer>
-  <maintainer email="marc@hanheide.net">Marc Hanheide</maintainer>
 
   <license>MIT</license>
 
   <url type="website"></url>
 
-  <author email="fdelduchetto@lincoln.ac.uk">Francesco Del Duchetto</author>
   <author email="abinch@sagarobotics.com">Adam Binch</author>
+  <author email="fdelduchetto@lincoln.ac.uk">Francesco Del Duchetto</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>message_generation</build_depend>
