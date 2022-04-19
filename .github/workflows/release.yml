@@ -12,8 +12,11 @@ on:
 jobs:
   release:
     uses: SAGARobotics/SagaWorkflows/.github/workflows/release.yml@v2.0
+    with:
+      runs-on: '["ubuntu-latest"]'
     secrets:
-      pat-token: ${{ secrets.SERVICE_ACCOUNT_PAT_REPO_READ }}
-      repo-user: ${{ secrets.SAGA_REPO_WRITE_USER }}
-      repo-pass: ${{ secrets.SAGA_REPO_WRITE_PASS }}
+      pat-token: ${{ secrets.CI_PAT_PUBLIC }}
+      repo-user: ${{ secrets.SAGA_REPO_PUBLIC_WRITE_USER }}
+      repo-pass: ${{ secrets.SAGA_REPO_PUBLIC_WRITE_PASS }}
+
     
