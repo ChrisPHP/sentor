@@ -111,6 +111,7 @@ class SafetyMonitor(object):
                 for expr in monitor.conditions:
                     if monitor.conditions[expr][self.crit_key]:
                         tag = Tag()
+                        tag.type = self.crit_key
                         tag.tag = monitor.conditions[expr]["tags"]
                         tags.tags.append(tag)
             

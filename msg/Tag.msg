@@ -1,1 +1,2 @@
+string type
 string[] tag
