@@ -7,6 +7,7 @@
   <arg name="auto_safety_tagging" default="true"/>
   <arg name="safety_pub_rate" default="10.0"/>
   <arg name="independent_tags" default="false"/>
+  <arg name="auto_topic" default="auto_mode"/>
 
 
   <node pkg="sentor" type="sentor_node.py" name="sentor" output="screen">
@@ -15,6 +16,7 @@
     <param name="~auto_safety_tagging" value="$(arg auto_safety_tagging)" />
     <param name="~safety_pub_rate" value="$(arg safety_pub_rate)" />
     <param name="~independent_tags" value="$(arg independent_tags)" />
+    <param name="~auto_topic" value="$(arg auto_topic)" />
   </node>	
 
 </launch>

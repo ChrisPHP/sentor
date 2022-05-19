@@ -21,6 +21,7 @@ class SafetyMonitor(object):
         timeout = rospy.get_param("~safe_operation_timeout", 10.0)
         rate = rospy.get_param("~safety_pub_rate", 10.0)
         self.auto_tagging = rospy.get_param("~auto_safety_tagging", True)
+        auto_topic = rospy.get_param("~auto_topic", "auto_mode")
 
         if timeout > 0:
             self.timeout = timeout
@@ -45,7 +46,8 @@ class SafetyMonitor(object):
 
         self.event_msg = event_msg + ": "
         
-        rospy.Subscriber('auto_mode', Bool, self.auto_mode_cb)
+        if auto_topic:
+            rospy.Subscriber(auto_topic, Bool, self.auto_mode_cb)
 
         self.safety_pub = rospy.Publisher(topic, Bool, queue_size=10)
         rospy.Timer(rospy.Duration(1.0/rate), self.safety_pub_cb)
