@@ -16,6 +16,8 @@ add_message_files(
   SentorEvent.msg
   Monitor.msg
   MonitorArray.msg
+  Tag.msg
+  TagArray.msg
 )
 
 add_service_files(
