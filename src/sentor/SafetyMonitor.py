@@ -6,7 +6,7 @@ Created on Fri Dec  6 08:51:15 2019
 """
 #####################################################################################
 from __future__ import division
-import rospy
+import rospy, rostopic
 from std_msgs.msg import Bool
 from sentor.msg import Tag, TagArray
 from std_srvs.srv import SetBool, SetBoolResponse
@@ -21,13 +21,16 @@ class SafetyMonitor(object):
         timeout = rospy.get_param("~safe_operation_timeout", 10.0)
         rate = rospy.get_param("~safety_pub_rate", 10.0)
         self.auto_tagging = rospy.get_param("~auto_safety_tagging", True)
+        
         auto_topic = rospy.get_param("~auto_topic", "auto_mode")
+        auto_topic = "/" + auto_topic if auto_topic[0] != "/" else auto_topic
 
         if timeout > 0:
             self.timeout = timeout
         else:
             self.timeout = 0.1
         
+        self.event_msg = event_msg + ": "
         self.attr = attr
         self.crit_key = crit_key
         self.event_cb = event_cb
@@ -43,16 +46,16 @@ class SafetyMonitor(object):
         self.auto = False
         
         self._stop_event = Event()
-
-        self.event_msg = event_msg + ": "
         
-        if auto_topic:
+        _, real_topic, _ = rostopic.get_topic_class(auto_topic, blocking=False)
+        if real_topic is not None:
             rospy.Subscriber(auto_topic, Bool, self.auto_mode_cb)
+            self.auto_takeover_pub = rospy.Publisher("/sentor/auto_takeover_reason", TagArray, queue_size=5)
+        else:
+            rospy.logwarn("Auto mode topic {} is not published".format(auto_topic))
 
         self.safety_pub = rospy.Publisher(topic, Bool, queue_size=10)
         rospy.Timer(rospy.Duration(1.0/rate), self.safety_pub_cb)
-        
-        self.auto_takeover_pub = rospy.Publisher("/sentor/auto_takeover_reason", TagArray, queue_size=5)
         
         rospy.Service("/sentor/" + srv, SetBool, self.srv_cb)
 
