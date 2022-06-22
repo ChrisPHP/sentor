@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <launch>
 
-  <arg name="topics" default=""/>
   <arg name="config_file" default=""/>
   <arg name="safe_operation_timeout" default="10.0"/>
   <arg name="auto_safety_tagging" default="true"/>
