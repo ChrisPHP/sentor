@@ -36,7 +36,8 @@ class sentor(object):
         self.rich_event_pub = rospy.Publisher('/sentor/rich_event', SentorEvent, queue_size=10)
         
         config_file = rospy.get_param("~config_file", "")
-        self.load_topics(config_file)
+        tags = rospy.get_param("~topic_tags", [])
+        self.load_topics(config_file, tags)
         self.instantiate()
         
         rospy.Service('/sentor/load_monitors', LoadMonitors, self.load_monitors)
@@ -68,12 +69,21 @@ class sentor(object):
         os._exit(signal.SIGTERM)
         
         
-    def load_topics(self, config_file):
+    def load_topics(self, config_file, tags=[]):
         self.topics = []
         
         try:
             items = [yaml.load(open(item, 'r')) for item in config_file.split(',')]
             self.topics = [item for sublist in items for item in sublist]
+            
+            if tags:
+                filtered_topics = []
+                for topic in self.topics:
+                    if "tags" in topic and any(tag in topic["tags"] for tag in tags):
+                        filtered_topics.append(topic)
+
+                self.topics = filtered_topics
+            
         except Exception as e:
             rospy.logerr("No configuration file provided: %s" % e)
             
@@ -155,7 +165,7 @@ class sentor(object):
     def load_monitors(self, req):
         
         try:
-            self.load_topics(req.config)
+            self.load_topics(req.config, req.tags)
             self.instantiate()
             return True
         except Exception as e:

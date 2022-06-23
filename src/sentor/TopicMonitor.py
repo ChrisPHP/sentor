@@ -17,6 +17,7 @@ import rospy
 import time
 import subprocess
 import os
+import uuid
 
 class bcolors:
     HEADER = '\033[95m'
@@ -103,8 +104,10 @@ class TopicMonitor(Thread):
         
         # if rate > 0 set in config then throttle topic at that rate
         if self.rate > 0:
+            _id = "".join(str(uuid.uuid4()).split("-"))
+            
             COMMAND_BASE = ["rosrun", "topic_tools", "throttle"]
-            subscribed_topic = "/sentor/monitoring/" + str(self.thread_num) + real_topic
+            subscribed_topic = "/sentor/monitoring/" + _id + real_topic
             
             command = COMMAND_BASE + ["messages", real_topic, str(self.rate), subscribed_topic]
             subprocess.Popen(command, stdout=open(os.devnull, "wb"))

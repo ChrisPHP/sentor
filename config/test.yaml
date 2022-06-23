@@ -23,6 +23,7 @@
       message: "expression 1 is False"
       level: "warn"
   default_notifications: False
+  tags: ["expr_1", "test_1"]
 
 
 - name : "/expr_2"
@@ -47,6 +48,7 @@
       message: "expression 2 is False"
       level: "warn"
   default_notifications: False
+  tags: ["expr_2", "test_2"]
 
 
 - name: "/safe_operation"
@@ -64,6 +66,7 @@
       level: info
   timeout: 0.1
   default_notifications: False
+  tags: ["safe_op", "test_1"]
 
 
 - name: "/pause_autonomous_operation"
@@ -81,4 +84,6 @@
       level: info
   timeout: 0.1
   default_notifications: False
+  tags: ["pause_op", "test_2"]
+
 
