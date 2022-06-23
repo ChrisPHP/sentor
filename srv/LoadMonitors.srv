@@ -1,0 +1,4 @@
+string config
+string[] tags
+---
+bool success

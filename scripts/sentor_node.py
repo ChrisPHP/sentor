@@ -11,6 +11,7 @@ from sentor.MultiMonitor import MultiMonitor
 from std_msgs.msg import String
 from sentor.msg import SentorEvent
 from std_srvs.srv import Empty, EmptyResponse
+from sentor.srv import LoadMonitors
 
 import signal
 import rospy
@@ -25,11 +26,6 @@ class sentor(object):
     
     def __init__(self):
         
-        self.topics = []
-        self.topic_monitors = []
-        
-        signal.signal(signal.SIGINT, self.__signal_handler)
-        
         self.safety_monitor = SafetyMonitor("safe_operation", "SAFE OPERATION", "thread_is_safe", "safety_critical", 
                                        "set_safety_tag", self.event_callback)
         self.autonomy_monitor = SafetyMonitor("pause_autonomous_operation", "SAFE AUTONOMOUS OPERATION", "thread_is_auto", 
@@ -39,11 +35,15 @@ class sentor(object):
         self.event_pub = rospy.Publisher('/sentor/event', String, queue_size=10)
         self.rich_event_pub = rospy.Publisher('/sentor/rich_event', SentorEvent, queue_size=10)
         
-        self.load_topics()
+        config_file = rospy.get_param("~config_file", "")
+        self.load_topics(config_file)
         self.instantiate()
         
+        rospy.Service('/sentor/load_monitors', LoadMonitors, self.load_monitors)
         rospy.Service('/sentor/stop_monitor', Empty, self.stop_monitoring)
         rospy.Service('/sentor/start_monitor', Empty, self.start_monitoring)
+        
+        signal.signal(signal.SIGINT, self.__signal_handler)
         
         rospy.spin()
         
@@ -68,9 +68,9 @@ class sentor(object):
         os._exit(signal.SIGTERM)
         
         
-    def load_topics(self):
+    def load_topics(self, config_file):
+        self.topics = []
         
-        config_file = rospy.get_param("~config_file", "")
         try:
             items = [yaml.load(open(item, 'r')) for item in config_file.split(',')]
             self.topics = [item for sublist in items for item in sublist]
@@ -79,6 +79,7 @@ class sentor(object):
             
             
     def instantiate(self):
+        self.topic_monitors = []
         
         print("Monitoring topics:")
         for i, topic in enumerate(self.topics):
@@ -149,6 +150,17 @@ class sentor(object):
         event.nodes = nodes
         event.topic = topic
         self.rich_event_pub.publish(event)
+        
+        
+    def load_monitors(self, req):
+        
+        try:
+            self.load_topics(req.config)
+            self.instantiate()
+            return True
+        except Exception as e:
+            rospy.logerr(e)
+            return False
         
         
     def stop_monitoring(self):
