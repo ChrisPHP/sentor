@@ -173,26 +173,24 @@ class sentor(object):
             return False
         
         
-    def stop_monitoring(self):
+    def stop_monitoring(self, req):
         for topic_monitor in self.topic_monitors:
             topic_monitor.stop_monitor()
             
         self.safety_monitor.stop_monitor()
         self.autonomy_monitor.stop_monitor()
-        self.multi_monitor.stop_monitor()
     
         rospy.logwarn("sentor_node stopped monitoring")
         ans = EmptyResponse()
         return ans
         
     
-    def start_monitoring(self):    
+    def start_monitoring(self, req):    
         for topic_monitor in self.topic_monitors:
             topic_monitor.start_monitor()
     
         self.safety_monitor.start_monitor()
         self.autonomy_monitor.start_monitor()
-        self.multi_monitor.start_monitor()
     
         rospy.logwarn("sentor_node started monitoring")
         ans = EmptyResponse()

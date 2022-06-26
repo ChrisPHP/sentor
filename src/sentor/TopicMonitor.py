@@ -83,6 +83,7 @@ class TopicMonitor(Thread):
         self.hz_monitor = None
         self.is_topic_published = True 
         self.is_instantiated = False
+        self.active = False
         self.is_instantiated = self._instantiate_monitors()
 
 
@@ -171,6 +172,7 @@ class TopicMonitor(Thread):
             print("")
 
         self.is_instantiated = True
+        self.active = True
 
         return True
     
@@ -502,10 +504,12 @@ class TopicMonitor(Thread):
             
             
     def stop_monitor(self):
+        self.active = False
         self._stop_event.set()
         
 
     def start_monitor(self):
+        self.active = True
         self._stop_event.clear()
         
 

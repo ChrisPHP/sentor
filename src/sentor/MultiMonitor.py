@@ -21,6 +21,7 @@ class MultiMonitor(object):
         self.topic_monitors = []
         self._stop_event = Event()
         self.error_code = []
+        self.actives = []
         
         self.monitors_pub = rospy.Publisher("/sentor/monitors", MonitorArray, latch=True, queue_size=1)
         rospy.Timer(rospy.Duration(1.0/rate), self.callback)
@@ -35,9 +36,11 @@ class MultiMonitor(object):
         if not self._stop_event.isSet():
             
             error_code_new = [monitor.conditions[expr]["satisfied"] for monitor in self.topic_monitors for expr in monitor.conditions]
+            actives_new = [monitor.active for monitor in self.topic_monitors]
             
-            if error_code_new != self.error_code:
+            if error_code_new != self.error_code or actives_new != self.actives:
                 self.error_code = error_code_new
+                self.actives = actives_new
                 
                 conditions = MonitorArray()
                 conditions.header.stamp = rospy.Time.now()
@@ -45,7 +48,8 @@ class MultiMonitor(object):
                 count = 0                
                 for monitor in self.topic_monitors:
                     topic_name = monitor.topic_name
-                    
+                    active = monitor.active
+                        
                     for expr in monitor.conditions:
                         condition = Monitor()
                         condition.topic = topic_name
@@ -54,6 +58,7 @@ class MultiMonitor(object):
                         condition.autonomy_critical = monitor.conditions[expr]["autonomy_critical"]
                         condition.satisfied = self.error_code[count]
                         condition.tags = monitor.conditions[expr]["tags"]
+                        condition.active = active
                         conditions.conditions.append(condition)
                         count+=1
                         
