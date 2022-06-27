@@ -22,7 +22,7 @@ add_message_files(
 
 add_service_files(
   FILES
-  LoadMonitors.srv
+  Client.srv
   GetTopicMaps.srv
 )
 

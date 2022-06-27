@@ -11,7 +11,7 @@ from sentor.MultiMonitor import MultiMonitor
 from std_msgs.msg import String
 from sentor.msg import SentorEvent
 from std_srvs.srv import Empty, EmptyResponse
-from sentor.srv import LoadMonitors
+from sentor.srv import Client
 
 import signal
 import rospy
@@ -40,7 +40,7 @@ class sentor(object):
         self.load_topics(config_file, tags)
         self.instantiate()
         
-        rospy.Service('/sentor/load_monitors', LoadMonitors, self.load_monitors)
+        rospy.Service('/sentor/load_monitors', Client, self.load_monitors)
         rospy.Service('/sentor/stop_monitor', Empty, self.stop_monitoring)
         rospy.Service('/sentor/start_monitor', Empty, self.start_monitoring)
         
@@ -76,10 +76,10 @@ class sentor(object):
             items = [yaml.load(open(item, 'r')) for item in config_file.split(',')]
             self.topics = [item for sublist in items for item in sublist]
             
-            if tags:
+            if tags and tags[0]:
                 filtered_topics = []
                 for topic in self.topics:
-                    if "tags" in topic and any(tag in topic["tags"] for tag in tags):
+                    if "topic_tags" in topic and any(tag in topic["topic_tags"] for tag in tags):
                         filtered_topics.append(topic)
 
                 self.topics = filtered_topics
@@ -165,7 +165,7 @@ class sentor(object):
     def load_monitors(self, req):
         
         try:
-            self.load_topics(req.config, req.tags)
+            self.load_topics(req.config, req.topic_tags)
             self.instantiate()
             return True
         except Exception as e:

@@ -1,0 +1,4 @@
+string config   # used only by service /sentor/load_monitors
+string[] topic_tags
+---
+bool success
