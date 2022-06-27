@@ -48,6 +48,7 @@ class MultiMonitor(object):
                 count = 0                
                 for monitor in self.topic_monitors:
                     topic_name = monitor.topic_name
+                    topic_tags = monitor.topic_tags
                     active = monitor.active
                         
                     for expr in monitor.conditions:
@@ -56,8 +57,9 @@ class MultiMonitor(object):
                         condition.condition = expr
                         condition.safety_critical = monitor.conditions[expr]["safety_critical"]
                         condition.autonomy_critical = monitor.conditions[expr]["autonomy_critical"]
-                        condition.satisfied = self.error_code[count]
                         condition.tags = monitor.conditions[expr]["tags"]
+                        condition.topic_tags = topic_tags
+                        condition.satisfied = self.error_code[count]
                         condition.active = active
                         conditions.conditions.append(condition)
                         count+=1

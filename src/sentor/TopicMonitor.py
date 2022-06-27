@@ -36,7 +36,7 @@ class TopicMonitor(Thread):
 
 
     def __init__(self, topic_name, rate, N, signal_when_config, signal_lambdas_config, processes, 
-                 timeout, default_notifications, event_callback, thread_num):
+                 timeout, default_notifications, event_callback, topic_tags):
         Thread.__init__(self)
 
         self.topic_name = topic_name
@@ -51,7 +51,7 @@ class TopicMonitor(Thread):
             self.timeout = 0.1
         self.default_notifications = default_notifications
         self._event_callback = event_callback
-        self.thread_num = thread_num
+        self.topic_tags = topic_tags
         
         self.independent_tags = rospy.get_param("~independent_tags", False)
         

@@ -38,6 +38,8 @@ class sentor(object):
         config_file = rospy.get_param("~config_file", "")
         tags = rospy.get_param("~topic_tags", [])
         self.load_topics(config_file, tags)
+        
+        self.topic_monitors_all = []
         self.instantiate()
         
         rospy.Service('/sentor/load_monitors', Client, self.load_monitors)
@@ -114,6 +116,7 @@ class sentor(object):
             processes = []
             timeout = 0
             default_notifications = True
+            topic_tags = []
             
             if 'rate' in topic:
                 rate = topic['rate']
@@ -129,11 +132,15 @@ class sentor(object):
                 timeout = topic['timeout']
             if 'default_notifications' in topic:
                 default_notifications = topic['default_notifications']
+            if 'topic_tags' in topic:
+                topic_tags = topic['topic_tags']
     
             topic_monitor = TopicMonitor(topic_name, rate, N, signal_when, signal_lambdas, processes, 
-                                         timeout, default_notifications, self.event_callback, i)
+                                         timeout, default_notifications, self.event_callback, topic_tags)
     
             self.topic_monitors.append(topic_monitor)
+            self.topic_monitors_all.append(topic_monitor)
+            
             self.safety_monitor.register_monitors(topic_monitor)
             self.autonomy_monitor.register_monitors(topic_monitor)
             self.multi_monitor.register_monitors(topic_monitor)
@@ -174,7 +181,7 @@ class sentor(object):
         
         
     def stop_monitoring(self, req):
-        for topic_monitor in self.topic_monitors:
+        for topic_monitor in self.topic_monitors_all:
             topic_monitor.stop_monitor()
             
         self.safety_monitor.stop_monitor()
@@ -186,7 +193,7 @@ class sentor(object):
         
     
     def start_monitoring(self, req):    
-        for topic_monitor in self.topic_monitors:
+        for topic_monitor in self.topic_monitors_all:
             topic_monitor.start_monitor()
     
         self.safety_monitor.start_monitor()
