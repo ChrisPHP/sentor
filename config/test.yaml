@@ -11,7 +11,6 @@
   signal_lambdas:
   - expression: "lambda msg : msg.data == False"
     timeout: 5.0
-    safety_critical: True
     autonomy_critical: True
     process_indices: [1]
     tags: ["expression 1"]
@@ -36,8 +35,7 @@
   signal_lambdas:
   - expression: "lambda msg : msg.data == False"
     timeout: 10.0
-    safety_critical: True
-    autonomy_critical: False
+    autonomy_critical: True
     process_indices: [1]
     tags: ["expression 2"]
   execute:
