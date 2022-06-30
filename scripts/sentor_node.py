@@ -65,7 +65,7 @@ class sentor(object):
                 self.topics = filtered_topics
             
         except Exception as e:
-            rospy.logerr("No configuration file provided: %s" % e)
+            rospy.logerr("Error loading configuration file: {}".format(e))
             
             
     def instantiate(self):
