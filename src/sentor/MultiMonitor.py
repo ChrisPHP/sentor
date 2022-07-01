@@ -24,6 +24,7 @@ class MultiMonitor(object):
         self.actives = []
         
         self.monitors_pub = rospy.Publisher("/sentor/monitors", MonitorArray, latch=True, queue_size=1)
+        self.monitors_pub.publish(MonitorArray())
         rospy.Timer(rospy.Duration(1.0/rate), self.callback)
 
 

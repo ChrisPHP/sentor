@@ -13,6 +13,7 @@ from sentor.MultiMonitor import MultiMonitor
 
 from std_msgs.msg import String
 from sentor.msg import SentorEvent
+from sentor.msg import MonitorArray
 from sentor.srv import Client
 ##########################################################################################
 
@@ -32,7 +33,10 @@ class sentor(object):
         self.event_pub = rospy.Publisher('/sentor/event', String, queue_size=10)
         self.rich_event_pub = rospy.Publisher('/sentor/rich_event', SentorEvent, queue_size=10)
         
+        self.topics = []
+        self.topic_monitors = []
         self.topic_monitors_all = []
+        
         config_file = rospy.get_param("~config_file", "")
         tags = rospy.get_param("~topic_tags", [])
         
@@ -153,10 +157,14 @@ class sentor(object):
         try:
             self.load_topics(req.config, req.topic_tags)
             self.instantiate()
-            return True, ""
+            rospy.sleep(0.3)
+            resp = rospy.wait_for_message('/sentor/monitors', MonitorArray)
+            return True, resp
         except Exception as e:
+            rospy.sleep(0.3)
             rospy.logerr(e)
-            return False, ""
+            resp = rospy.wait_for_message('/sentor/monitors', MonitorArray)
+            return False, resp
         
         
     def stop_monitoring(self, req):
@@ -170,9 +178,12 @@ class sentor(object):
             else:
                 monitor.stop_monitor()
                 success = True
-                
+        
+        rospy.sleep(0.3)        
         rospy.logwarn("sentor node stopped monitoring topics")
-        return success, "echo the topic /sentor/monitors to see which monitors are currently active"
+        resp = rospy.wait_for_message('/sentor/monitors', MonitorArray)
+        
+        return success, resp
         
     
     def start_monitoring(self, req):
@@ -186,9 +197,12 @@ class sentor(object):
             else:
                 monitor.start_monitor()
                 success = True
-    
+        
+        rospy.sleep(0.3)
         rospy.logwarn("sentor node started monitoring topics")
-        return success, "echo the topic /sentor/monitors to see which monitors are currently active"
+        resp = rospy.wait_for_message('/sentor/monitors', MonitorArray)
+        
+        return success, resp
     
     
     def __signal_handler(self, signum, frame):
