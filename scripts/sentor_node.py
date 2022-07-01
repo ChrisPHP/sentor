@@ -171,7 +171,7 @@ class sentor(object):
         
         success = False
         for monitor in self.topic_monitors_all:
-            if req.topic_tags[0]:
+            if req.topic_tags and req.topic_tags[0]:
                 if any(tag in monitor.topic_tags for tag in req.topic_tags):
                     monitor.stop_monitor()
                     success = True
@@ -190,7 +190,7 @@ class sentor(object):
         
         success = False
         for monitor in self.topic_monitors_all:
-            if req.topic_tags[0]:
+            if req.topic_tags and req.topic_tags[0]:
                 if any(tag in monitor.topic_tags for tag in req.topic_tags):
                     monitor.start_monitor()
                     success = True
