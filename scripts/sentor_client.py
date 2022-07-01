@@ -13,12 +13,12 @@ from sentor.srv import Client, ClientRequest
 def usage():
     print("\nLoads/stops/starts topic monitors:")
     print("\nFor loading monitors:")
-    print("\t rosrun sentor sentor_client.py load CONFIG TAG1 TAG2 TAGN")
+    print("\t rosrun sentor sentor_client.py load CONFIG TOPIC_TAG_1 TOPIC_TAG_2 TOPIC_TAG_N")
     print("\nFor stopping monitors:")
-    print("\t rosrun sentor sentor_client.py stop TAG1 TAG2 TAGN")
+    print("\t rosrun sentor sentor_client.py stop TOPIC_TAG_1 TOPIC_TAG_2 TOPIC_TAG_N")
     print("\nFor starting monitors:")
-    print("\t rosrun sentor sentor_client.py start TAG1 TAG2 TAGN")
-    print("\nTags are optional args used to load/stop/start specific monitors")
+    print("\t rosrun sentor sentor_client.py start TOPIC_TAG_1 TOPIC_TAG_2 TOPIC_TAG_N")
+    print("\nTopic tags are optional args used to load/stop/start specific monitors")
     print("\n\n")
     
     
