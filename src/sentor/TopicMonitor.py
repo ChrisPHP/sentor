@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-@author: Francesco Del Duchetto (FDelDuchetto@lincoln.ac.uk)
 @author: Adam Binch (abinch@sagarobotics.com)
+@author: Francesco Del Duchetto (FDelDuchetto@lincoln.ac.uk)
 """
 #####################################################################################
 from sentor.ROSTopicHz import ROSTopicHz
@@ -237,6 +237,8 @@ class TopicMonitor(Thread):
         lambda_config["expr"] = ""
         lambda_config["file"] = None
         lambda_config["package"] = None
+        lambda_config["init_args"] = None
+        lambda_config["run_args"] = None
         lambda_config["timeout"] = self.timeout
         lambda_config["safety_critical"] = False
         lambda_config["autonomy_critical"] = False
@@ -253,6 +255,10 @@ class TopicMonitor(Thread):
             lambda_config["file"] = signal_lambda["file"]
         if "package" in signal_lambda:
             lambda_config["package"] = signal_lambda["package"]
+        if "init_args" in signal_lambda:
+            lambda_config["init_args"] = signal_lambda["init_args"]
+        if "run_args" in signal_lambda:
+            lambda_config["run_args"] = signal_lambda["run_args"]
         if "timeout" in signal_lambda:
             lambda_config["timeout"] = signal_lambda["timeout"]
         if "safety_critical" in signal_lambda:
@@ -314,16 +320,16 @@ class TopicMonitor(Thread):
         
 
     def _instantiate_lambda_monitor(self, subscribed_topic, msg_class, lambda_fn_str, lambda_config):
-        filter = ROSTopicFilter(self.topic_name, lambda_fn_str, lambda_config, lambda_config["N"])
+        _filter = ROSTopicFilter(self.topic_name, lambda_fn_str, lambda_config, lambda_config["N"])
 
         if lambda_config["N"] <= 0:
-            cb = filter.callback_filter
+            cb = _filter.callback_filter
         else:
-            cb = filter.callback_filter_throttled
+            cb = _filter.callback_filter_throttled
             
         rospy.Subscriber(subscribed_topic, msg_class, cb)
 
-        return filter
+        return _filter
         
 
     def run(self):

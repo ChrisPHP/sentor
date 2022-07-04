@@ -7,6 +7,11 @@ Created on Fri Nov 20 11:35:22 2020
 #########################################################################################################
 # SENTOR CUSTOM LAMBDA
 
-def CustomLambda(msg):
-    return msg.data == "t1-r1-c2"
+class CustomLambda(object):
+    
+    def __init__(self):
+        pass
+        
+    def run(self, msg):
+        return msg.data == False
 #########################################################################################################
