@@ -13,5 +13,5 @@ class CustomLambda(object):
         pass
         
     def run(self, msg):
-        return msg.data == "r1-cz"
+        return msg.data == "r1-cy"
 #########################################################################################################

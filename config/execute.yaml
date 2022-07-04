@@ -2,7 +2,7 @@
 
 - name: "/current_node"
   signal_lambdas:
-  - expression: "lambda msg: msg.data == 'r1-ca'"
+  - expression: "lambda msg: msg.data == 'r1-cb'"
     safety_critical: True
     process_indices: [0,1,2,3,4,5]
     repeat_exec: False
