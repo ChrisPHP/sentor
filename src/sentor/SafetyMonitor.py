@@ -73,7 +73,7 @@ class SafetyMonitor(object):
         if not self._stop_event.isSet():
 
             if self.topic_monitors:
-                threads_are_safe = [getattr(monitor, self.attr) for monitor in self.topic_monitors]
+                threads_are_safe = [getattr(monitor, self.attr) for monitor in self.topic_monitors if monitor.active]
                 self.bad_monitors = [i for i, item in enumerate(threads_are_safe) if not item]
                 
                 if self.auto_tagging and all(threads_are_safe) and self.timer is None:

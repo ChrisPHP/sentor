@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-@author: Francesco Del Duchetto (FDelDuchetto@lincoln.ac.uk)
 @author: Adam Binch (abinch@sagarobotics.com)
+@author: Francesco Del Duchetto (FDelDuchetto@lincoln.ac.uk)
 """
 #####################################################################################
 from sentor.ROSTopicHz import ROSTopicHz
@@ -17,6 +17,7 @@ import rospy
 import time
 import subprocess
 import os
+import uuid
 
 class bcolors:
     HEADER = '\033[95m'
@@ -35,7 +36,7 @@ class TopicMonitor(Thread):
 
 
     def __init__(self, topic_name, rate, N, signal_when_config, signal_lambdas_config, processes, 
-                 timeout, default_notifications, event_callback, thread_num):
+                 timeout, default_notifications, event_callback, topic_tags):
         Thread.__init__(self)
 
         self.topic_name = topic_name
@@ -50,7 +51,7 @@ class TopicMonitor(Thread):
             self.timeout = 0.1
         self.default_notifications = default_notifications
         self._event_callback = event_callback
-        self.thread_num = thread_num
+        self.topic_tags = topic_tags
         
         self.independent_tags = rospy.get_param("~independent_tags", False)
         
@@ -82,6 +83,7 @@ class TopicMonitor(Thread):
         self.hz_monitor = None
         self.is_topic_published = True 
         self.is_instantiated = False
+        self.active = False
         self.is_instantiated = self._instantiate_monitors()
 
 
@@ -103,8 +105,10 @@ class TopicMonitor(Thread):
         
         # if rate > 0 set in config then throttle topic at that rate
         if self.rate > 0:
+            _id = "".join(str(uuid.uuid4()).split("-"))
+            
             COMMAND_BASE = ["rosrun", "topic_tools", "throttle"]
-            subscribed_topic = "/sentor/monitoring/" + str(self.thread_num) + real_topic
+            subscribed_topic = "/sentor/monitoring/" + _id + real_topic
             
             command = COMMAND_BASE + ["messages", real_topic, str(self.rate), subscribed_topic]
             subprocess.Popen(command, stdout=open(os.devnull, "wb"))
@@ -168,6 +172,7 @@ class TopicMonitor(Thread):
             print("")
 
         self.is_instantiated = True
+        self.active = True
 
         return True
     
@@ -232,6 +237,8 @@ class TopicMonitor(Thread):
         lambda_config["expr"] = ""
         lambda_config["file"] = None
         lambda_config["package"] = None
+        lambda_config["init_args"] = None
+        lambda_config["run_args"] = None
         lambda_config["timeout"] = self.timeout
         lambda_config["safety_critical"] = False
         lambda_config["autonomy_critical"] = False
@@ -248,6 +255,10 @@ class TopicMonitor(Thread):
             lambda_config["file"] = signal_lambda["file"]
         if "package" in signal_lambda:
             lambda_config["package"] = signal_lambda["package"]
+        if "init_args" in signal_lambda:
+            lambda_config["init_args"] = signal_lambda["init_args"]
+        if "run_args" in signal_lambda:
+            lambda_config["run_args"] = signal_lambda["run_args"]
         if "timeout" in signal_lambda:
             lambda_config["timeout"] = signal_lambda["timeout"]
         if "safety_critical" in signal_lambda:
@@ -309,16 +320,16 @@ class TopicMonitor(Thread):
         
 
     def _instantiate_lambda_monitor(self, subscribed_topic, msg_class, lambda_fn_str, lambda_config):
-        filter = ROSTopicFilter(self.topic_name, lambda_fn_str, lambda_config, lambda_config["N"])
+        _filter = ROSTopicFilter(self.topic_name, lambda_fn_str, lambda_config, lambda_config["N"])
 
         if lambda_config["N"] <= 0:
-            cb = filter.callback_filter
+            cb = _filter.callback_filter
         else:
-            cb = filter.callback_filter_throttled
+            cb = _filter.callback_filter_throttled
             
         rospy.Subscriber(subscribed_topic, msg_class, cb)
 
-        return filter
+        return _filter
         
 
     def run(self):
@@ -499,10 +510,12 @@ class TopicMonitor(Thread):
             
             
     def stop_monitor(self):
+        self.active = False
         self._stop_event.set()
         
 
     def start_monitor(self):
+        self.active = True
         self._stop_event.clear()
         
 

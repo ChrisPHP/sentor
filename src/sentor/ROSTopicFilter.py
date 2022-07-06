@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-@author: Francesco Del Duchetto (FDelDuchetto@lincoln.ac.uk)
 @author: Adam Binch (abinch@sagarobotics.com)
+@author: Francesco Del Duchetto (FDelDuchetto@lincoln.ac.uk)
 """
 #####################################################################################
 from __future__ import division
@@ -24,9 +24,19 @@ class ROSTopicFilter(object):
         self.throttle = self.throttle_val
         
         self.lambda_fn = None
+        self.custom_lambda = False
+        
         try:
             if config["file"] is not None and config["package"] is not None:
-                self.lambda_fn = _import("{}.{}".format(config["package"], config["file"]), self.lambda_fn_str)
+                lambda_fn = _import("{}.{}".format(config["package"], config["file"]), self.lambda_fn_str)
+                
+                if config["init_args"] is not None:
+                    args = config["init_args"]
+                    self.lambda_fn = lambda_fn(*args)
+                else:
+                    self.lambda_fn = lambda_fn()
+                self.custom_lambda = True
+                
             else:
                 self.lambda_fn = eval(self.lambda_fn_str)
         except Exception as e:
@@ -45,7 +55,14 @@ class ROSTopicFilter(object):
             return
 
         try:
-            self.filter_satisfied = self.lambda_fn(msg)
+            if not self.custom_lambda:
+                self.filter_satisfied = self.lambda_fn(msg)
+            else:
+                if self.config["run_args"] is not None:
+                    args = self.config["run_args"]
+                    self.filter_satisfied = self.lambda_fn.run(msg, *args)
+                else:
+                    self.filter_satisfied = self.lambda_fn.run(msg)
         except Exception as e:
             rospy.logwarn("Exception while evaluating %s: %s" % (self.lambda_fn_str, e))
 

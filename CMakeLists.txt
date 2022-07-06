@@ -22,6 +22,7 @@ add_message_files(
 
 add_service_files(
   FILES
+  Client.srv
   GetTopicMaps.srv
 )
 
