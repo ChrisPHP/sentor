@@ -5,7 +5,7 @@
 """
 #####################################################################################
 from __future__ import division
-import rospy, math, numpy
+import rospy, math, numpy, json
 # imported the packages math and numpy so that they can be used in the lambda expressions
 
 def _import(location, name):
